@@ -12,6 +12,7 @@ import java.util.Scanner;
 public class Board {
     public static final int SIZE = 9;
     private Integer[][] board = new Integer[SIZE][SIZE];
+    private static int contChar = 0;  //contatore
 
 
     /** Costruttore che prende in input il file del sudoku ed inizializza la board
@@ -21,13 +22,16 @@ public class Board {
         File inputFile = new File(path.toString());
         try  {
             Scanner s = new Scanner(inputFile);
-            for(int row = 0; row < SIZE; row++){
+            int row = 0;
+            while(s.hasNextLine()){
                 String line = s.nextLine();
-                for (int column = 0; column < SIZE; column++){
+                for (int column = 0; column < SIZE; column++)
                     board[row][column] = readValue(line.charAt(column)); //questa riga setta realmente la cella della board
-                }
                 row++;
             }
+            System.out.println("Empty cells: " + (81 - contChar));
+            double percFill = 100 * contChar / 81;
+            System.out.println("Fill factor: " + percFill + "%");
         } catch (FileNotFoundException e) {System.out.println("File non trovato");}
     }
 
@@ -36,7 +40,11 @@ public class Board {
      * @return un intero rappresentante il carattere in input o null
      */
     private Integer readValue(char c) {
-        return c != '.' ? Integer.valueOf(c + "") : null; //questo è un modo per fare il costrutto IF(corrisponde al punto itnerrogativo)- ELSE(corrisponde ai due punti) in una sola riga
+        if (c != '.'){
+            contChar++;
+            return Integer.valueOf(c + "");
+        } else
+            return null;
     }
 
     /** Metodo che prende in input una cella (row, column) e ritorna la lista dei numeri che possono essere inseriti in quella cella in base alle regole del sudoku
@@ -112,10 +120,20 @@ public class Board {
     /** Metodo che stampa la board del sudoku TODO: da modificare per farlo bene */
     public void getBoard(){
         for (int row = 0; row  < SIZE; row++) {
-            for (int column = 0; column < SIZE; column++)
+            if (row%3 == 0) {
+                System.out.print("|");
+                System.out.println("-----------|");
+            }
+
+            for (int column = 0; column < SIZE; column++) {
+                if (column%3 == 0) System.out.print("|");
                 System.out.print(board[row][column]);
+            }
+            System.out.print("|");
             System.out.println();
         }
-
+        System.out.println("|-----------|");
+        System.out.println();
+        System.out.println();
     }
 }

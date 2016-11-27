@@ -11,11 +11,10 @@ public class Main {
     public static void main(String[] args){
         Scanner s = new Scanner(System.in);
         String command = s.nextLine();                                      //leggo il comando in input
-        String[] parameters = command.split( " ");                   //splitto il comando cosi da avere da una parte la parola chaive (sequential) e dall'altra parte il path
-        if (parameters[0].equals("sequential")) {                          //se il primo parametro è "sequential" allora eseguo l'algoritmo sequenziale
-            SequentialSolver solver = new SequentialSolver(parameters[1]);//esegue il tutto
+        if (command.startsWith("sequential")) {                          //se il primo parametro è "sequential" allora eseguo l'algoritmo sequenziale
+            SequentialSolver solver = new SequentialSolver(command.substring(11));//esegue il tutto
             System.out.println(solver.start());
-            solver.printBoard().getBoard();
+            //System.out.println(SequentialSolver.count);
         }
     }
 

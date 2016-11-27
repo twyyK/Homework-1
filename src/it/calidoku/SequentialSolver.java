@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 /** Classe che si occupa del vero e proprio algoritmo sequenziale*/
 public class SequentialSolver {
     private Board board;
+    //public static int count = 0;
 
     /** Costruttore che da in pasto il percorso alla classe che gestisce la board
      * @param percorso il percorso
@@ -28,12 +29,19 @@ public class SequentialSolver {
         int SIZE = Board.SIZE;
         int row = index/SIZE, column = index%SIZE;                             //row = trova la riga della cella corrente, column = trova la colonna della cella corrente
 
-        if (index == SIZE*SIZE) return true;                                   //se index = 81 vuol dire che sono arrivato alla fine del sudoku e quindi l'ho risolto
+
+        if (index == SIZE*SIZE){
+            //count++;
+            return true;                                   //se index = 81 vuol dire che sono arrivato alla fine del sudoku e quindi l'ho risolto
+        }
         if (board.isFilled(row, column))  return solve(board, index+1); //se la cella corrente è piena passo a quella successiva ricorsivamente
 
         for (Integer value : board.getOptionsForCell(row, column)) {           //se arriviamo qui vuol dire che la cella è vuota e itero su ogni valore che posso mettere dentro alla cella corrente
             board.setCellValue(row, column, value);                            //setto il valore nella cella
-            if (solve(board, index+1)) return true;                     //e passo alla cella successiva ricorsivamente
+            if (solve(board, index+1)){
+                //count++;
+                return true;                     //e passo alla cella successiva ricorsivamente
+            }
         }
         board.clearCell(row, column);                                         //se arrivo qui vuol dire che il sudoku non è risolvibile quindi ritorno false
         return false;
