@@ -6,7 +6,10 @@ import java.nio.file.Paths;
 /** Classe che si occupa del vero e proprio algoritmo sequenziale*/
 public class SequentialSolver {
     private Board board;
+    private int SIZE = Board.SIZE;
     public static int count = 0;
+
+
     private static boolean solvable = false; //variabile che tiene conto se un sudoku ha almeno una soluzione
 
     /** Costruttore che da in pasto il percorso alla classe che gestisce la board
@@ -29,7 +32,6 @@ public class SequentialSolver {
      * @return true se il sudoku è stato risolto, false altrimenti
      */
     private boolean solve(Board board, int index) {
-        int SIZE = Board.SIZE;
         int row = index/SIZE, column = index%SIZE;                             //row = trova la riga della cella corrente, column = trova la colonna della cella corrente
 
 
@@ -46,7 +48,7 @@ public class SequentialSolver {
         }
 
         board.clearCell(row, column);                                         //se arrivo qui vuol dire che il sudoku non è risolvibile quindi ritorno false
-        return solvable == false ? false : true;                              //se solvable è true allora ritorno true altrimenti false perchè non è risolvibile
+        return solvable;                              //se solvable è true allora ritorno true altrimenti false perchè non è risolvibile
     }
 
     /*** ritorna la board del sudoku corrente

@@ -37,6 +37,10 @@ public class Board {
         } catch (FileNotFoundException e) {System.out.println("File non trovato");}
     }
 
+    public Board(Integer[][] board){
+        this.board = board;
+    }
+
     /** Metodo che prende in input un carattere e se è un numero lo trasforma in Integer, altrimenti ritorna null
      * @param c un carattere letto dal file in input del costruttore
      * @return un intero rappresentante il carattere in input o null
@@ -120,7 +124,7 @@ public class Board {
     }
 
     /** Metodo che stampa la board del sudoku TODO: da modificare per farlo bene */
-    public void getBoard(){
+    synchronized public void getPrintedBoard(){
         for (int row = 0; row  < SIZE; row++) {
             if (row%3 == 0) {
                 System.out.print("|");
@@ -129,7 +133,8 @@ public class Board {
 
             for (int column = 0; column < SIZE; column++) {
                 if (column%3 == 0) System.out.print("|");
-                System.out.print(board[row][column]);
+                if (board[row][column] == null) System.out.print(".");
+                else System.out.print(board[row][column]);
             }
             System.out.print("|");
             System.out.println();
@@ -137,6 +142,10 @@ public class Board {
         System.out.println("|-----------|");
         System.out.println();
         System.out.println();
+    }
+
+    public Integer[][] getBoard(){
+        return board;
     }
 
     /** Calcola la dimensione dello spazio delle soluzioni del sudoku
