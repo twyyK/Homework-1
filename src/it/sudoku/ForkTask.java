@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by User on 28/11/2016.
@@ -14,6 +15,7 @@ public class ForkTask extends RecursiveTask<Boolean> {
     private Board board;
     private int index;
     private int SIZE = Board.SIZE;
+    private int CUTOFF = 50;
 
     private int row;
     private int column;
@@ -34,7 +36,8 @@ public class ForkTask extends RecursiveTask<Boolean> {
      *
      * @return the result of the computation
      */
-    static int count = 0;
+    static AtomicInteger count = new AtomicInteger(0);
+
     @Override
     protected Boolean compute() {
         return solve(board, index);
@@ -45,26 +48,35 @@ public class ForkTask extends RecursiveTask<Boolean> {
         int row = index / SIZE, column = index % SIZE;                             //row = trova la riga della cella corrente, column = trova la colonna della cella corrente
         List<ForkTask> taskList = new ArrayList<>();
         if (index == SIZE * SIZE) {                     //se index = 81 vuol dire che sono arrivato alla fine del sudoku e quindi l'ho risolto
-            count++;                                //incremento il contatore delle soluzioni perchè quando si entra dentro questo IF vuol dire che è stato risolto un sudoku
+            count.getAndIncrement();                                //incremento il contatore delle soluzioni perchè quando si entra dentro questo IF vuol dire che è stato risolto un sudoku
             //board.getPrintedBoard();
             return true;
         }
         if (board.isFilled(row, column))
             return solve(board, index + 1);  //se la cella corrente è piena passo a quella successiva ricorsivamente
 
-
-        for (Integer value : board.getOptionsForCell(row, column)) {           //se arriviamo qui vuol dire che la cella è vuota e itero su ogni valore che posso mettere dentro alla cella corrente
-            Board b = new Board(copyBoard(board.getBoard()));
-            b.setCellValue(row, column, value);                            //setto il valore nella cella
-
-            taskList.add(new ForkTask(b, index+1));
-            //taskList.add(task);
-            //task.getBoard().getPrintedBoard();
+        Board b;
+        if (board.computeSearchSpace().compareTo(BigInteger.valueOf(CUTOFF)) == -1) {
+            for (Integer value : board.getOptionsForCell(row, column)) {
+                board.setCellValue(row, column, value);
+                if (solve(board, index +1)) solvable = true;
+            }
+        }else {
+            for (Integer value : board.getOptionsForCell(row, column)) {           //se arriviamo qui vuol dire che la cella è vuota e itero su ogni valore che posso mettere dentro alla cella corrente
+                b = new Board(copyBoard(board.getBoard()));
+                b.setCellValue(row, column, value);                            //setto il valore nella cella
+                ForkTask task = new ForkTask(b, index + 1);
+                taskList.add(task);
+                task.fork();
+                //taskList.add(new ForkTask(b, index+1));
+                //task.getBoard().getPrintedBoard();
+            }
         }
 
-        invokeAll(taskList);
         board.clearCell(row, column);
 
+        for (ForkTask t: taskList)
+            t.join();
         //se arrivo qui vuol dire che il sudoku non è risolvibile quindi ritorno false
 
 
